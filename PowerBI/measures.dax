@@ -1,0 +1,80 @@
+-- ============================================================================
+-- FinTrust 360 - Power BI DAX Table & Measures
+-- Source table: FinTrust_Cleaned (imported from Dataset/FinTrust_Cleaned.csv)
+-- ============================================================================
+
+
+-- ----------------------------------------------------------------------------
+-- 1. Calculated Calendar Table (create via Modeling -> New Table)
+-- ----------------------------------------------------------------------------
+-- Builds a contiguous daily calendar spanning the earliest and latest
+-- date_received in FinTrust_Cleaned. After creating this table:
+--   1) Mark DateTable as a Date Table using DateTable[Date].
+--   2) Sort DateTable[Year-Month] by DateTable[YearMonthSort] (and DateTable[Month Name] by DateTable[Month Number]).
+--   3) Create a 1-to-many relationship: DateTable[Date] -> FinTrust_Cleaned[date_received].
+DateTable =
+ADDCOLUMNS(
+    CALENDAR(
+        MIN(FinTrust_Cleaned[date_received]),
+        MAX(FinTrust_Cleaned[date_received])
+    ),
+    "Year", YEAR([Date]),
+    "Quarter", "Q" & FORMAT([Date], "Q"),
+    "Month Number", MONTH([Date]),
+    "Month Name", FORMAT([Date], "MMM"),
+    "Year-Month", FORMAT([Date], "YYYY-MM"),
+    "YearMonthSort", YEAR([Date]) * 100 + MONTH([Date])
+)
+
+
+-- ----------------------------------------------------------------------------
+-- 2. Measures for table: FinTrust_Cleaned (create via Modeling -> New Measure)
+-- ----------------------------------------------------------------------------
+
+-- Total Complaints
+-- Counts all complaint records in FinTrust_Cleaned across both Closed and Open statuses.
+Total Complaints =
+COUNTROWS(FinTrust_Cleaned)
+
+-- Open Complaints
+-- Counts complaints whose response_status is "Open" (still awaiting a company response).
+Open Complaints =
+CALCULATE(
+    [Total Complaints],
+    FinTrust_Cleaned[response_status] = "Open"
+)
+
+-- Closed Complaints
+-- Counts complaints whose response_status is "Closed".
+Closed Complaints =
+CALCULATE(
+    [Total Complaints],
+    FinTrust_Cleaned[response_status] = "Closed"
+)
+
+-- Timely Response Rate
+-- Calculates the share of Closed complaints that received a timely response ("Yes").
+-- Excludes Open complaints because their timely_response is blank until resolved.
+-- Format as Percentage (e.g., 0.00%) in Power BI Desktop.
+Timely Response Rate =
+VAR ClosedCount = [Closed Complaints]
+VAR TimelyClosedCount =
+    CALCULATE(
+        [Total Complaints],
+        FinTrust_Cleaned[response_status] = "Closed",
+        FinTrust_Cleaned[timely_response] = "Yes"
+    )
+RETURN
+    DIVIDE(TimelyClosedCount, ClosedCount, BLANK())
+
+-- Avg Response Time
+-- Calculates the mean response turnaround in days across Closed complaints only.
+-- Uses FinTrust_Cleaned[response_days] (date_company_responded minus date_received)
+-- and filters explicitly to Closed complaints so Open rows are excluded.
+-- Format as Decimal Number (e.g., 0.00) in Power BI Desktop.
+Avg Response Time =
+CALCULATE(
+    AVERAGE(FinTrust_Cleaned[response_days]),
+    FinTrust_Cleaned[response_status] = "Closed"
+)
+
