@@ -1,36 +1,34 @@
 # AI_USAGE.md
 
-Project: CommerceIQ 360 – E-Commerce Delivery & Customer Experience Analytics
+Project: **FinTrust 360 – Financial Customer Complaints & Response Analytics**
+
+## Permission
+The internship company told me I could use AI assistance on this project. I am documenting it here.
 
 ## Tools used
-- Claude (Anthropic) – planning, data profiling, drafting SQL / DAX, explaining concepts
-- Antigravity (Google agent IDE) – running the cleaning script and file tasks
+- **Claude (Anthropic)**: reviewing my project against the brief, planning the remaining steps, explaining concepts.
+- **Antigravity (Google agent IDE)**: editing and running the Python cleaning script, adding SQL comments, writing the DAX file, generating the PDF report, writing README/AI_USAGE drafts, git commands.
 
 ## How AI helped
 
 | Area | What AI did | What I did |
 |---|---|---|
-| Understanding the brief | Explained the task structure and the KPI traps (distinct order IDs, one review per order, delivered-sales formula) | Read the brief myself and wrote the KPI definitions in the README |
-| Data cleaning | Profiled the CSV and suggested cleaning rules (duplicates, label trimming, region fill from city) | [Describe: ran the script, reviewed the log, tested in Excel] |
-| SQL | Drafted the first version of the 9 queries | [Describe: ran each query, compared totals, fixed/edited queries] |
-| Power BI | Suggested DAX measures and a page layout | [Describe: built the report, tested measures, formatted visuals] |
-| Analysis | Helped structure findings and recommendations | [Describe: wrote the final findings in my own words from my results] |
+| Data cleaning (`Scripts/clean_fintrust.py`) | Added `state_missing_flag`, `response_days`, the `Cleaning_Log` sheet and CSV export; ran the script | Built the original cleaning (25 duplicates removed, label standardisation, date checks) and reviewed the outputs |
+| SQL (`SQL/Analysis.sql`) | Added explanatory comments to the 10 queries; replaced `CURRENT_DATE()` with `'2026-11-25'` | Wrote the original 10 queries |
+| Power BI (`PowerBI/measures.dax`) | Wrote the DateTable and 5 KPI measures | [Fill in only what you actually did in Power BI Desktop] |
+| Analysis report (`Report/FinTrust_Analysis.pdf`) | Computed figures from the cleaned CSV, drafted the findings and recommendations, rendered the PDF | Reviewed the text and numbers |
+| Documentation | Drafted README and this file | Reviewed and corrected them |
 
-## How I verified the output
+## How the output was checked
+- Row counts from the cleaned CSV: 5,000 source rows, 25 duplicates removed, 4,975 rows (4,665 Closed, 310 Open).
+- Timely response rate (90.08%, 4,202 of 4,665) and average response time (8.76 days) recomputed in Python on Closed complaints only.
+- Cleaned workbook sheets and the Cleaning_Log opened and read.
 
-- Opened the raw CSV in Excel and confirmed 5,000 rows, and found the duplicate rows with Remove Duplicates (25 found).
-- Checked category and payment labels with filters after cleaning (7 categories, 4 payment methods).
-- Counted blanks with COUNTBLANK (0 missing regions, 30 missing cities).
-- Ran every SQL query and compared the results with the cleaned data:
-  - 3,599 total orders, 3,430 delivered orders
-  - Delivered sales about $676,669
-  - Average rating about 3.94, based on one review per order
-- Checked that Power BI KPI cards match the SQL results.
-- [Add anything else you actually checked.]
+## Not yet done / limitations
+- [Edit this section to match reality before submitting.] The SQL file has not been executed against a MySQL database, and the Power BI report has not been fully built and cross-checked against the PDF figures.
 
-## Where AI output was wrong or needed changing
-
-- [Write real examples here, e.g. a query that double-counted reviews, a wrong column name, a DAX measure that needed fixing.]
+## Where AI output needed correcting
+- An earlier version of this file was a template from a different project (CommerceIQ 360) and described checks I had not run. It was replaced with this version.
 
 ## Responsibility
-All AI-generated code and text was reviewed by me before use. The final analysis, recommendations and conclusions reflect my own understanding of the results.
+I reviewed the AI-assisted work before submitting it, and I am responsible for what is in this repository.
